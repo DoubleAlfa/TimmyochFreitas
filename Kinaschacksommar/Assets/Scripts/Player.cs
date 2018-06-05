@@ -8,4 +8,14 @@ public class Player : MonoBehaviour
     int _playerIndex;
     bool _human;
     #endregion
+    #region Properties
+    public int playerIndex
+    {
+        get { return _playerIndex; }
+    }
+    public bool human
+    {
+        get { return _human; }
+    }
+    #endregion
 }
