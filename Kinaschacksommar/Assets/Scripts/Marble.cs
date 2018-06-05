@@ -8,16 +8,4 @@ public class Marble : MonoBehaviour
     Tile _tile;
     Player _player;
     #endregion
-
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

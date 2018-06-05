@@ -10,15 +10,5 @@ public class Tile : MonoBehaviour
     Marble _marble;
     #endregion
 
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
+    
 }

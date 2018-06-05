@@ -10,15 +10,5 @@ public class State : MonoBehaviour
     Tile[,] _tileNests;
     Player _activePlayer;
     #endregion
-    // Use this for initialization
-    void Start()
-    {
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

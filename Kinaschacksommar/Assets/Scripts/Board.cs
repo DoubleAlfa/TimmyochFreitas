@@ -22,7 +22,7 @@ public class Board : MonoBehaviour
         _gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         _numberOfRows = _tileRows.Length;
         _tiles = new GameObject[_numberOfRows][];
-        for (int i = 0; i < _numberOfRows; i++)
+        for (int i = 0; i < _numberOfRows; i++) //Spawnar ut brädet
         {
             _tiles[i] = new GameObject[_tileRows[i]];
             for (int j = 0; j < _tileRows[i]; j++)
