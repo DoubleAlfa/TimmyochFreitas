@@ -5,7 +5,7 @@ using UnityEngine;
 public class Tile
 {
     #region Variabler
-
+    Marble marble;
     #endregion
     #region Properties
     public bool isOccupied
@@ -20,34 +20,35 @@ public class Tile
     {
         get; set;
     }
-    public Marble marble
+    public Marble Marble
     {
-        get; set;
+        get { return marble; }
+        set { marble = value; marble.tile = this; }
     }
 
 
     #endregion
     #region Konstruktor
-    public Tile(Tile t)
+    public Tile(Tile t) //Gör en djup kopia av brickan
     {
         isOccupied = t.isOccupied;
         xPos = t.xPos;
         yPos = t.yPos;
         if (t.isOccupied)
-            marble = new Marble(t.marble, this);
+            marble = new Marble(t.marble.owner, this);
         else
             marble = null;
     }
-    public Tile(int x,int y,Marble m)
+    public Tile(int x, int y, Marble m) //Ifall det finns en pjäs utplacerad på brickan
     {
         isOccupied = true;
         xPos = x;
         yPos = y;
-        marble = new Marble(m,this);
+        marble = new Marble(m, this);
     }
-    public Tile(int x,int y)
+    public Tile(int x, int y) //Ifall det inte finns en pjäs utplacerad på brickan
     {
-        isOccupied = true;
+        isOccupied = false;
         xPos = x;
         yPos = y;
         marble = null;

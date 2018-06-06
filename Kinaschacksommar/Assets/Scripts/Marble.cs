@@ -8,22 +8,29 @@ public class Marble
     Tile _tile;
     Player _owner;
     #endregion
-    #region
+    #region Properties
     public Tile tile
     {
         get { return _tile; }
+        set { _tile = value; }
     }
     public Player owner
     {
         get { return _owner; }
+        set { _owner = value; }
     }
     #endregion
     #region Konstruktor
-    public Marble (Marble m, Tile t)
+    public Marble(Marble m, Tile t) //Gör en djup kopia av pjäsen
     {
         _owner = m.owner;
         _tile = t;
         Debug.Log("Om det här inte är null så borde det fungera: " + t.xPos);
+    }
+    public Marble(Player owner, Tile t) //Skapar en ny pjäs
+    {
+        _owner = owner;
+        _tile = t;
     }
     #endregion
 }

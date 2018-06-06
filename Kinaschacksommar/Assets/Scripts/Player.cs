@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     #region Variabler
-    int _playerIndex;
+    int _playerIndex, _nestIndex;
     bool _human;
     #endregion
     #region Properties
@@ -13,9 +13,22 @@ public class Player : MonoBehaviour
     {
         get { return _playerIndex; }
     }
+    public int nestIndex
+    {
+        get { return _nestIndex; }
+    }
     public bool human
     {
         get { return _human; }
+    }
+    #endregion
+
+    #region Konstruktor
+    public Player (int index,int nestIndex, bool isHuman)
+    {
+        _playerIndex = index;
+        _human = isHuman;
+        _nestIndex = nestIndex;
     }
     #endregion
 }
