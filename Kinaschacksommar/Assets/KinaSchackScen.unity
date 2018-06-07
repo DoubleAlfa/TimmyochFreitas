@@ -347,7 +347,7 @@ MonoBehaviour:
   _tile: {fileID: 1585138719844724, guid: dd1ea0e2f26130440ab36b9d4261c6c6, type: 2}
   _offset: 1.2
   colors:
-  - {r: 0, g: 0.08965492, b: 1, a: 0}
+  - {r: 0, g: 0, b: 1, a: 0}
   - {r: 0.6137929, g: 0, b: 1, a: 0}
   - {r: 1, g: 0, b: 0, a: 0}
   - {r: 0, g: 1, b: 0.33793116, a: 0}
