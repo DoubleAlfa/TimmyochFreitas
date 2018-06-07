@@ -15,6 +15,10 @@ public class GameLogic : MonoBehaviour
     #endregion
 
     #region Properties
+    public State currentState
+    {
+        get { return _currentState; }
+    }
     #endregion
 
     #region Metoder
@@ -187,14 +191,31 @@ public class GameLogic : MonoBehaviour
         }
         return adjacentTiles;
     }
-    public void MoveAMarble(State s)
+    public void MoveAMarble(State s, Tile fromTile, Tile toTile)
     {
-
+        List<Tile>[] legalMoves = GetValidMoves(fromTile, s);
+        for (int i = 0; i < legalMoves.Length; i++)
+        {
+            foreach (Tile t in legalMoves[i])
+            {
+                if (t.xPos == toTile.xPos && t.yPos == toTile.yPos)
+                {
+                    toTile.Marble = fromTile.Marble;
+                    fromTile.isOccupied = false;
+                    
+                }
+            }
+        }
     }
-    int GetXIndex(int y, int x, State s)
+    public void TestMove()
     {
-        int startIndex = 6 - (s.TileRows[y].Length / 2);
-        return x - startIndex;
+        MoveAMarble(_currentState, _currentState.TileRows[2][2], _currentState.TileRows[4][8]);
+    }
+        int GetXIndex(int y, int x, State s)
+        {
+            int startIndex = 6 - (s.TileRows[y].Length / 2);
+            return x - startIndex;
+        }
+    
     }
     #endregion
-}

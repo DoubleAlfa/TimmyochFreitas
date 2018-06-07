@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     #region Variabler
-    int _numberOfPlayers = 6;
+    int _numberOfPlayers = 4;
     GameLogic _gl;
     Board _board;
     #endregion
@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
             return _numberOfPlayers;
         }
     }
+    
     #endregion
 
     #region Metoder
@@ -26,6 +27,14 @@ public class GameManager : MonoBehaviour
         _gl = GetComponent<GameLogic>();
         _board = GameObject.Find("Board").GetComponent<Board>();
         _gl.CreateStartState();
+    }
+    void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.S))
+        {
+            _gl.TestMove();
+            _board.PlaceTheMarbles(_gl.currentState);
+        }
     }
     #endregion
 }

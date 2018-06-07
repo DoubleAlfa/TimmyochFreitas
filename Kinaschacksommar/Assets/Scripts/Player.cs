@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 //Andreas de Freitas && Timmy Alvelöv
-public class Player : MonoBehaviour
+public class Player
 {
     #region Variabler
     int _playerIndex, _nestIndex;
