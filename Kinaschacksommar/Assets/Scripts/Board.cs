@@ -97,11 +97,19 @@ public class Board : MonoBehaviour
         _nests[3] = new GameObject[] { _tiles[12][0], _tiles[9][0], _tiles[10][0], _tiles[10][1], _tiles[11][0], _tiles[11][1], _tiles[11][2], _tiles[12][1], _tiles[12][2], _tiles[12][3] };
         _nests[4] = new GameObject[] { _tiles[12][12], _tiles[9][9], _tiles[10][9], _tiles[10][10], _tiles[11][9], _tiles[11][10], _tiles[11][11], _tiles[12][9], _tiles[12][10], _tiles[12][11] };
 
-        for (int i = 0; i < _nests.Length; i++)
+        for (int i = 0; i < _nests.Length; i++) //Sätter färger på brickor
         {
             for (int j = 0; j < _nests[i].Length; j++)
             {
-                _nests[i][j].GetComponent<Renderer>().material.color = colors[i];
+                Color c = colors[i];
+                if(c.b +0.4f <= 1)
+                c.b += 0.4f;
+                if(c.g + 0.4f <= 1)
+                c.g += 0.4f;
+                if(c.r + 0.4f <= 1)
+                c.r += 0.4f;
+                _nests[i][j].GetComponent<Renderer>().material.color = c;
+                
             }
         }
     }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 //Andreas de Freitas && Timmy Alvelöv
+public enum Dir { NW, NE, E, SE, SW, W };
+
 public class GameLogic : MonoBehaviour
 {
     #region Variabler
@@ -77,7 +79,7 @@ public class GameLogic : MonoBehaviour
             if (_gm.NumberOfPlayers != 3)
                 players[i] = new Player(i, nestOrder[i], isHuman);
             else
-                players[i] = new Player(i, i*2, isHuman);
+                players[i] = new Player(i, i * 2, isHuman);
             isHuman = false;
         }
 
@@ -91,7 +93,108 @@ public class GameLogic : MonoBehaviour
         }
         _currentState = new State(tempTiles, tempMarbles, players[0]);
         _board.PlaceTheMarbles(_currentState);
+    }
+    Tile GetAdjacent(Tile t, Dir direction, State s)
+    {
+        if (t.yPos % 2 != 0)
+        {
+            switch (direction)
+            {
+                case Dir.NW:
+                    if (t.yPos <= 0 || t.xPos < s.TileRows[t.yPos - 1][0].xPos || t.xPos > s.TileRows[t.yPos - 1][s.TileRows[t.yPos - 1].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos - 1][GetXIndex(t.yPos - 1, t.xPos, s)];
+                case Dir.NE:
+                    if (t.yPos <= 0 || t.xPos + 1 < s.TileRows[t.yPos - 1][0].xPos || t.xPos + 1 > s.TileRows[t.yPos - 1][s.TileRows[t.yPos - 1].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos - 1][GetXIndex(t.yPos - 1, t.xPos + 1, s)];
+                case Dir.E:
+                    if (t.xPos >= s.TileRows[t.yPos][s.TileRows[t.yPos].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos][GetXIndex(t.yPos, t.xPos + 1, s)];
+                case Dir.SE:
+                    if (t.yPos >= s.TileRows.Length - 1 || t.xPos + 1 < s.TileRows[t.yPos + 1][0].xPos || t.xPos + 1 > s.TileRows[t.yPos + 1][s.TileRows[t.yPos + 1].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos + 1][GetXIndex(t.yPos + 1, t.xPos + 1, s)];
+                case Dir.SW:
+                    if (t.yPos >= s.TileRows.Length - 1 || t.xPos < s.TileRows[t.yPos + 1][0].xPos || t.xPos > s.TileRows[t.yPos + 1][s.TileRows[t.yPos + 1].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos + 1][GetXIndex(t.yPos + 1, t.xPos, s)];
+                case Dir.W:
+                    if (t.xPos >= s.TileRows[t.yPos][s.TileRows[t.yPos].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos][GetXIndex(t.yPos, t.xPos - 1, s)];
+                default:
+                    Debug.Log("Invalid Direction");
+                    return new Tile(-1, -1);
+            }
+        }
+        else
+        {
+            switch (direction)
+            {
+                case Dir.NW:
+                    if (t.yPos <= 0 || t.xPos - 1 < s.TileRows[t.yPos - 1][0].xPos || t.xPos - 1 > s.TileRows[t.yPos - 1][s.TileRows[t.yPos - 1].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos - 1][GetXIndex(t.yPos - 1, t.xPos - 1, s)];
+                case Dir.NE:
+                    if (t.yPos <= 0 || t.xPos < s.TileRows[t.yPos - 1][0].xPos || t.xPos > s.TileRows[t.yPos - 1][s.TileRows[t.yPos - 1].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos - 1][GetXIndex(t.yPos - 1, t.xPos, s)];
+                case Dir.E:
+                    if (t.xPos >= s.TileRows[t.yPos][s.TileRows[t.yPos].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos][GetXIndex(t.yPos, t.xPos + 1, s)];
+                case Dir.SE:
+                    if (t.yPos >= s.TileRows.Length - 1 || t.xPos < s.TileRows[t.yPos + 1][0].xPos || t.xPos > s.TileRows[t.yPos + 1][s.TileRows[t.yPos + 1].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos + 1][GetXIndex(t.yPos + 1, t.xPos, s)];
+                case Dir.SW:
+                    if (t.yPos >= s.TileRows.Length - 1 || t.xPos - 1 < s.TileRows[t.yPos + 1][0].xPos || t.xPos - 1 > s.TileRows[t.yPos + 1][s.TileRows[t.yPos + 1].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos + 1][GetXIndex(t.yPos + 1, t.xPos - 1, s)];
+                case Dir.W:
+                    if (t.xPos >= s.TileRows[t.yPos][s.TileRows[t.yPos].Length - 1].xPos)
+                        return new Tile(-1, -1);
+                    return s.TileRows[t.yPos][GetXIndex(t.yPos, t.xPos - 1, s)];
+                default:
+                    Debug.Log("Invalid Direction");
+                    return new Tile(-1, -1);
+            }
+        }
+    }
+    List<Tile>[] GetValidMoves(Tile t, State s)
+    {
+        List<Tile>[] adjacentTiles = new List<Tile>[2];
+        adjacentTiles[0] = new List<Tile>();
+        adjacentTiles[1] = new List<Tile>();
+        Dir[] directions = { Dir.NE, Dir.NW, Dir.E, Dir.SE, Dir.SW, Dir.W };
+        for (int i = 0; i < directions.Length; i++)
+        {
+            Tile tempTile = GetAdjacent(t, directions[i], s);
+            if (tempTile.xPos != -1)
+            {
+                if (!tempTile.isOccupied)
+                    adjacentTiles[0].Add(tempTile);
+                else
+                {
+                    tempTile = GetAdjacent(tempTile, directions[i], s);
+                    if (tempTile.xPos != -1 && !tempTile.isOccupied)
+                        adjacentTiles[1].Add(tempTile);
+                }
+            }
 
+        }
+        return adjacentTiles;
+    }
+    public void MoveAMarble(State s)
+    {
+
+    }
+    int GetXIndex(int y, int x, State s)
+    {
+        int startIndex = 6 - (s.TileRows[y].Length / 2);
+        return x - startIndex;
     }
     #endregion
 }
