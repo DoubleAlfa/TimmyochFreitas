@@ -11,13 +11,17 @@ public class GameLogic : MonoBehaviour
     GameManager _gm;
     Board _board;
     int[] _tileRows = new int[] { 1, 2, 3, 4, 13, 12, 11, 10, 9, 10, 11, 12, 13, 4, 3, 2, 1 }, nestOrder = new int[] { 0, 5, 1, 4, 2, 3 };
-    Player[] players;
+    Player[] _players;
     #endregion
 
     #region Properties
     public State currentState
     {
         get { return _currentState; }
+    }
+    public Player[] players 
+    {
+        get { return _players; }
     }
     #endregion
 
@@ -32,7 +36,7 @@ public class GameLogic : MonoBehaviour
         Tile[][] tempTiles = new Tile[17][];
         Tile[][] tempNests = new Tile[6][];
         Marble[,] tempMarbles;
-        players = new Player[_gm.NumberOfPlayers];
+        _players = new Player[_gm.NumberOfPlayers];
 
         if (_gm.NumberOfPlayers == 2)
         {
@@ -70,32 +74,49 @@ public class GameLogic : MonoBehaviour
         tempNests[3] = new Tile[] { tempTiles[12][0], tempTiles[9][0], tempTiles[10][0], tempTiles[10][1], tempTiles[11][0], tempTiles[11][1], tempTiles[11][2], tempTiles[12][1], tempTiles[12][2], tempTiles[12][3] };
         tempNests[4] = new Tile[] { tempTiles[12][12], tempTiles[9][9], tempTiles[10][9], tempTiles[10][10], tempTiles[11][9], tempTiles[11][10], tempTiles[11][11], tempTiles[12][9], tempTiles[12][10], tempTiles[12][11] };
 
-        for (int i = 0; i < tempNests.Length; i++)
+        Tile[][] startNests = new Tile[_gm.NumberOfPlayers][];
+
+        if (_gm.NumberOfPlayers != 3 && _gm.NumberOfPlayers <= 6)
         {
-            for (int j = 0; j < tempNests[i].Length; j++)
+            for (int i = 0; i < _gm.NumberOfPlayers; i++)
             {
-                tempNests[i][j].isOccupied = true; //LÄGG TILL STÖD FÖR ATT MAN INTE ÄR SEX SPELARE
+                startNests[i] = tempNests[nestOrder[i]];
+            }
+        }
+        else if (_gm.NumberOfPlayers == 3)
+        {
+            for (int i = 0; i < _gm.NumberOfPlayers; i++)
+            {
+                startNests[i] = tempNests[i * 2];
+            }
+        }
+
+        for (int i = 0; i < startNests.Length; i++)
+        {
+            for (int j = 0; j < startNests[i].Length; j++)
+            {
+                startNests[i][j].isOccupied = true;
             }
         }
         bool isHuman = true;
         for (int i = 0; i < _gm.NumberOfPlayers; i++)
         {
             if (_gm.NumberOfPlayers != 3)
-                players[i] = new Player(i, nestOrder[i], isHuman);
+                _players[i] = new Player(i, nestOrder[i],tempNests[5-nestOrder[i]], isHuman);
             else
-                players[i] = new Player(i, i * 2, isHuman);
+                _players[i] = new Player(i, i * 2,tempNests[5- i*2] ,isHuman);
             isHuman = false;
         }
 
-        for (int i = 0; i < tempNests.Length; i++)
+        for (int i = 0; i < startNests.Length; i++)
         {
-            for (int j = 0; j < tempNests[i].Length; j++)
+            for (int j = 0; j < startNests[i].Length; j++)
             {
-                tempMarbles[i, j] = new Marble(players[i], tempNests[nestOrder[i]][j]);
-                tempNests[nestOrder[i]][j].Marble = tempMarbles[i, j];
+                tempMarbles[i, j] = new Marble(_players[i], startNests[i][j]);
+                startNests[i][j].Marble = tempMarbles[i, j];
             }
         }
-        _currentState = new State(tempTiles, tempMarbles, players[0]);
+        _currentState = new State(tempTiles, tempMarbles, _players[0]);
         _board.PlaceTheMarbles(_currentState);
     }
     Tile GetAdjacent(Tile t, Dir direction, State s)
@@ -125,9 +146,10 @@ public class GameLogic : MonoBehaviour
                         return new Tile(-1, -1);
                     return s.TileRows[t.yPos + 1][GetXIndex(t.yPos + 1, t.xPos, s)];
                 case Dir.W:
-                    if (t.xPos >= s.TileRows[t.yPos][s.TileRows[t.yPos].Length - 1].xPos)
+                    if (t.xPos <= s.TileRows[t.yPos][0].xPos)
                         return new Tile(-1, -1);
-                    return s.TileRows[t.yPos][GetXIndex(t.yPos, t.xPos - 1, s)];
+                    int temp = GetXIndex(t.yPos, t.xPos - 1, s);
+                    return s.TileRows[t.yPos][temp];
                 default:
                     Debug.Log("Invalid Direction");
                     return new Tile(-1, -1);
@@ -158,7 +180,7 @@ public class GameLogic : MonoBehaviour
                         return new Tile(-1, -1);
                     return s.TileRows[t.yPos + 1][GetXIndex(t.yPos + 1, t.xPos - 1, s)];
                 case Dir.W:
-                    if (t.xPos >= s.TileRows[t.yPos][s.TileRows[t.yPos].Length - 1].xPos)
+                    if (t.xPos <= s.TileRows[t.yPos][0].xPos)
                         return new Tile(-1, -1);
                     return s.TileRows[t.yPos][GetXIndex(t.yPos, t.xPos - 1, s)];
                 default:
@@ -189,6 +211,9 @@ public class GameLogic : MonoBehaviour
             }
 
         }
+
+        print(adjacentTiles[0].Count + " " + adjacentTiles[1].Count);
+        
         return adjacentTiles;
     }
     public void MoveAMarble(State s, Tile fromTile, Tile toTile)
@@ -202,7 +227,7 @@ public class GameLogic : MonoBehaviour
                 {
                     toTile.Marble = fromTile.Marble;
                     fromTile.isOccupied = false;
-                    
+
                 }
             }
         }
@@ -211,11 +236,11 @@ public class GameLogic : MonoBehaviour
     {
         MoveAMarble(_currentState, _currentState.TileRows[2][2], _currentState.TileRows[4][8]);
     }
-        int GetXIndex(int y, int x, State s)
-        {
-            int startIndex = 6 - (s.TileRows[y].Length / 2);
-            return x - startIndex;
-        }
-    
+    int GetXIndex(int y, int x, State s)
+    {
+        int startIndex = 6 - (s.TileRows[y].Length / 2);
+        return x - startIndex;
     }
-    #endregion
+
+}
+#endregion

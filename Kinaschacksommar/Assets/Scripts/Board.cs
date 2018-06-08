@@ -32,6 +32,8 @@ public class Board : MonoBehaviour
             {
                 _tiles[i][j] = Instantiate(_tile);
                 _tiles[i][j].transform.position = transform.position - new Vector3(_offset * ((float)_tileRows[i] / 2) - _offset * j, _offset * i, 0);
+                _tiles[i][j].GetComponent<ObjectTile>().yIndex = i;
+                _tiles[i][j].GetComponent<ObjectTile>().xIndex = j;
             }
         }
         SetNests();
