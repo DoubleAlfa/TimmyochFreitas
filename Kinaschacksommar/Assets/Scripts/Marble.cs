@@ -7,6 +7,7 @@ public class Marble
     #region Variabler
     Tile _tile;
     Player _owner;
+    string _text ="nope";
     #endregion
     #region Properties
     public Tile tile
@@ -18,6 +19,11 @@ public class Marble
     {
         get { return _owner; }
         set { _owner = value; }
+    }
+    public string text
+    {
+        get { return _text; }
+        set { _text = value; }
     }
     #endregion
     #region Konstruktor
@@ -33,4 +39,5 @@ public class Marble
         _tile = t;
     }
     #endregion
+
 }

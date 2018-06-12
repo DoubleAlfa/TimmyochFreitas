@@ -19,7 +19,7 @@ public class GameLogic : MonoBehaviour
     {
         get { return _currentState; }
     }
-    public Player[] players 
+    public Player[] players
     {
         get { return _players; }
     }
@@ -102,9 +102,9 @@ public class GameLogic : MonoBehaviour
         for (int i = 0; i < _gm.NumberOfPlayers; i++)
         {
             if (_gm.NumberOfPlayers != 3)
-                _players[i] = new Player(i, nestOrder[i],tempNests[5-nestOrder[i]], isHuman);
+                _players[i] = new Player(i, nestOrder[i], tempNests[5 - nestOrder[i]], isHuman);
             else
-                _players[i] = new Player(i, i * 2,tempNests[5- i*2] ,isHuman);
+                _players[i] = new Player(i, i * 2, tempNests[5 - i * 2], isHuman);
             isHuman = false;
         }
 
@@ -119,6 +119,7 @@ public class GameLogic : MonoBehaviour
         _currentState = new State(tempTiles, tempMarbles, _players[0]);
         _board.PlaceTheMarbles(_currentState);
     }
+
     Tile GetAdjacent(Tile t, Dir direction, State s)
     {
         if (t.yPos % 2 != 0)
@@ -189,7 +190,8 @@ public class GameLogic : MonoBehaviour
             }
         }
     }
-    List<Tile>[] GetValidMoves(Tile t, State s)
+
+    public List<Tile>[] GetValidMoves(Tile t, State s)
     {
         List<Tile>[] adjacentTiles = new List<Tile>[2];
         adjacentTiles[0] = new List<Tile>();
@@ -206,18 +208,33 @@ public class GameLogic : MonoBehaviour
                 {
                     tempTile = GetAdjacent(tempTile, directions[i], s);
                     if (tempTile.xPos != -1 && !tempTile.isOccupied)
+                    {
+                        for (int j = 0; j < s.visitedTiles.Count; j++)
+                        {
+                            if (s.visitedTiles[j] == tempTile)
+                                goto Exit;
+                        }
                         adjacentTiles[1].Add(tempTile);
+                    Exit:
+                        ;
+                    }
+
                 }
             }
 
         }
-
-        print(adjacentTiles[0].Count + " " + adjacentTiles[1].Count);
-        
         return adjacentTiles;
     }
-    public void MoveAMarble(State s, Tile fromTile, Tile toTile)
+
+    public List<Tile> GetJumpMoves(Tile t, State s)
     {
+        return GetValidMoves(t, s)[1];
+
+    }
+
+    public bool MoveAMarble(State s, Tile fromTile, Tile toTile)
+    {
+        Marble m = fromTile.Marble;
         List<Tile>[] legalMoves = GetValidMoves(fromTile, s);
         for (int i = 0; i < legalMoves.Length; i++)
         {
@@ -227,19 +244,38 @@ public class GameLogic : MonoBehaviour
                 {
                     toTile.Marble = fromTile.Marble;
                     fromTile.isOccupied = false;
+                    if (i == 0)
+                        return true;
+                    else
+                        return false;
 
                 }
             }
         }
+        return false;
     }
-    public void TestMove()
-    {
-        MoveAMarble(_currentState, _currentState.TileRows[2][2], _currentState.TileRows[4][8]);
-    }
-    int GetXIndex(int y, int x, State s)
+
+    public int GetXIndex(int y, int x, State s)
     {
         int startIndex = 6 - (s.TileRows[y].Length / 2);
         return x - startIndex;
+    }
+
+    public bool WinCheck(State state, Player player)
+    {
+        Tile tempTile;
+        for (int i = 0; i < player.goalNest.Length; i++)
+        {
+            tempTile = state.TileRows[player.goalNest[i].yPos][GetXIndex(player.goalNest[i].yPos, player.goalNest[i].xPos, state)];
+            if (tempTile.isOccupied)
+            {
+                if (tempTile.Marble.owner != player)
+                    return false;
+            }
+            else
+                return false;
+        }
+        return true;
     }
 
 }

@@ -23,7 +23,7 @@ public class Tile
     public Marble Marble
     {
         get { return marble; }
-        set { marble = value; marble.tile = this; isOccupied = true; }
+        set { marble = value;marble.tile = this; isOccupied = true; }
     }
 
 

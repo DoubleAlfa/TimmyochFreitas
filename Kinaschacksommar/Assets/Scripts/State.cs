@@ -10,6 +10,8 @@ public class State
     Tile[][] _tileNests;
     Player _activePlayer;
     GameManager _gm;
+    List<Tile> _visitedTiles;
+    int _currentValue;
     #endregion
 
     #region Properties
@@ -25,16 +27,93 @@ public class State
     {
         get { return _activePlayer; }
     }
+    public List<Tile> visitedTiles
+    {
+        get { return _visitedTiles; }
+    }
+    public int currentValue
+    {
+        get { return _currentValue; }
+        set { _currentValue = value; }
+    }
     #endregion
 
     #region Metoder
-   
+    public void VisitTile(Tile t)
+    {
+        _visitedTiles.Add(t);
+    }
+    public void ClearVisitList()
+    {
+        _visitedTiles.Clear();
+    }
     #endregion
+
+    public int Value(Player player)
+    {
+        int value = 1000;
+        if (_gm.gl.WinCheck(this, player)) //Har vi vunnit i detta state?
+            return value;
+
+        Marble tempMarble;
+        List<Marble> tempMarbles = findPlayerMarbles(player);
+
+
+        for (int i = 0; i < tempMarbles.Count; i++) //Räkna ut vilket state som är närmst bo:t med alla pjäser
+        {
+            tempMarble = tempMarbles[i];
+            Debug.Log(tempMarble.tile.yPos);
+            value -= Mathf.Abs(tempMarble.tile.xPos - player.goalNest[0].xPos);
+            value -= Mathf.Abs(tempMarble.tile.yPos - player.goalNest[0].yPos);
+        }
+        Debug.Log(value);
+        return value;
+    }
+    public List<State> Expand(Player player)
+    {
+        List<State> children = new List<State>();
+        List<State> tempChildren = new List<State>();
+        State tempState;
+        List<Tile>[] validMoves;
+        List<Marble> playerMarbles = findPlayerMarbles(player);
+        for (int i = 0; i < playerMarbles.Count; i++)
+        {
+            validMoves = _gm.gl.GetValidMoves(playerMarbles[i].tile, this);
+            for (int c = 0; c < validMoves[0].Count; c++)
+            {
+                tempState = new State(this);
+                _gm.gl.MoveAMarble(tempState, FindCorrespondingTile(playerMarbles[i].tile),FindCorrespondingTile(validMoves[0][c]));
+                children.Add(tempState);
+            }
+        }
+
+        return children;
+    }
+    Tile FindCorrespondingTile(Tile t)
+    {
+        return TileRows[t.yPos][_gm.gl.GetXIndex(t.yPos, t.xPos,this)]; 
+    }
+
+    List<Marble> findPlayerMarbles(Player player)
+    {
+        List<Marble> tempMarbles = new List<Marble>();
+        for (int i = 0; i < _gm.gl.currentState.TileRows.Length; i++)
+        {
+            for (int j = 0; j < _gm.gl.currentState.TileRows[i].Length; j++)
+            {
+                if (_gm.gl.currentState.TileRows[i][j].isOccupied)
+                    if (_gm.gl.currentState.TileRows[i][j].Marble.owner.playerIndex == player.playerIndex)
+                        tempMarbles.Add(_gm.gl.currentState.TileRows[i][j].Marble);
+            }
+        }
+        return tempMarbles;
+    }
 
     #region Konstruktor
     public State(Tile[][] tiles, Marble[,] marbles, Player activePlayer)
     {
         _gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+        _visitedTiles = new List<Tile>();
         _tileRows = new Tile[17][];
         for (int i = 0; i < tiles.Length; i++) //Gör en djup kopia av alla tiles
         {

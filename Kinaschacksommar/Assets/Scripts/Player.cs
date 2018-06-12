@@ -9,6 +9,7 @@ public class Player
     bool _human;
     Tile[] _goalNest;
     #endregion
+
     #region Properties
     public int playerIndex
     {

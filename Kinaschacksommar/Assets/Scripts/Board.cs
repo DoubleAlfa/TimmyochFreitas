@@ -14,8 +14,10 @@ public class Board : MonoBehaviour
     GameObject[,] _marbles;
     GameObject[][] _tiles, _nests;
     GameManager _gm;
+    GameLogic _gl;
     [SerializeField]
     Color[] colors = new Color[6];
+
     #endregion
 
     #region Metoder
@@ -23,6 +25,7 @@ public class Board : MonoBehaviour
     void Awake()
     {
         _gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+        _gl = GameObject.Find("GameManager").GetComponent<GameLogic>();
         _numberOfRows = _tileRows.Length;
         _tiles = new GameObject[_numberOfRows][];
         for (int i = 0; i < _numberOfRows; i++) //Spawnar ut brädet
@@ -104,14 +107,14 @@ public class Board : MonoBehaviour
             for (int j = 0; j < _nests[i].Length; j++)
             {
                 Color c = colors[i];
-                if(c.b +0.4f <= 1)
-                c.b += 0.4f;
-                if(c.g + 0.4f <= 1)
-                c.g += 0.4f;
-                if(c.r + 0.4f <= 1)
-                c.r += 0.4f;
+                if (c.b + 0.4f <= 1)
+                    c.b += 0.4f;
+                if (c.g + 0.4f <= 1)
+                    c.g += 0.4f;
+                if (c.r + 0.4f <= 1)
+                    c.r += 0.4f;
                 _nests[i][j].GetComponent<Renderer>().material.color = c;
-                
+
             }
         }
     }
@@ -119,7 +122,6 @@ public class Board : MonoBehaviour
     public void PlaceTheMarbles(State s)
     {
         int[] playerCounter = new int[_gm.NumberOfPlayers];
-        int c = 0;
         for (int i = 0; i < s.TileRows.Length; i++)
         {
             for (int j = 0; j < s.TileRows[i].Length; j++)
@@ -128,15 +130,57 @@ public class Board : MonoBehaviour
                 {
                     Player player = s.TileRows[i][j].Marble.owner;
                     _marbles[player.playerIndex, playerCounter[player.playerIndex]].transform.position = GetTileCoords(s.TileRows[i][j].xPos, s.TileRows[i][j].yPos).transform.position;
+                    _tiles[i][j].GetComponent<ObjectTile>().marbleObject = _marbles[player.playerIndex, playerCounter[player.playerIndex]].GetComponent<ObjectMarble>();
                     playerCounter[player.playerIndex]++;
                 }
             }
         }
     }
-    GameObject GetTileCoords(int x, int y)
+    public GameObject GetTileCoords(int x, int y)
     {
         int startIndex = 6 - (_tileRows[y] / 2);
         return _tiles[y][x - startIndex];
+    }
+
+    public void ShowValidMoves(Tile fromTile, bool showColor)
+    {
+        List<Tile>[] validMoves = new List<Tile>[2];
+        validMoves = _gl.GetValidMoves(fromTile, _gl.currentState);
+        for (int i = 0; i < validMoves.Length; i++)
+        {
+            foreach (Tile t in validMoves[i])
+            {
+                if (showColor)
+                    GetTileCoords(t.xPos, t.yPos).GetComponent<ObjectTile>().ShowColor();
+                else
+                    GetTileCoords(t.xPos, t.yPos).GetComponent<ObjectTile>().ResetColor();
+            }
+        }
+
+    }
+    public void ShowJumpMoves(Tile fromTile, bool showColor)
+    {
+        List<Tile>[] validMoves = new List<Tile>[2];
+        validMoves = _gl.GetValidMoves(fromTile, _gl.currentState);
+        foreach (Tile t in validMoves[1])
+        {
+            if (showColor)
+                GetTileCoords(t.xPos, t.yPos).GetComponent<ObjectTile>().ShowColor();
+            else
+                GetTileCoords(t.xPos, t.yPos).GetComponent<ObjectTile>().ResetColor();
+        }
+    }
+
+    public void AssignOwners()
+    {
+        for (int i = 0; i < _marbles.GetLength(0); i++)
+        {
+            for (int j = 0; j < _marbles.GetLength(1); j++)
+            {
+                _marbles[i, j].GetComponent<ObjectMarble>().owner = _gl.players[i];
+            }
+        }
+
     }
     #endregion
 }
