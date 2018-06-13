@@ -36,6 +36,10 @@ public class State
         get { return _currentValue; }
         set { _currentValue = value; }
     }
+    public GameManager gm
+    {
+        get { return _gm; }
+    }
     #endregion
 
     #region Metoder
@@ -47,7 +51,7 @@ public class State
     {
         _visitedTiles.Clear();
     }
-    #endregion
+    
 
     public int Value(Player player)
     {
@@ -57,16 +61,19 @@ public class State
 
         Marble tempMarble;
         List<Marble> tempMarbles = findPlayerMarbles(player);
-
+        float distance = 0;
 
         for (int i = 0; i < tempMarbles.Count; i++) //Räkna ut vilket state som är närmst bo:t med alla pjäser
         {
             tempMarble = tempMarbles[i];
-            Debug.Log(tempMarble.tile.yPos);
-            value -= Mathf.Abs(tempMarble.tile.xPos - player.goalNest[0].xPos);
-            value -= Mathf.Abs(tempMarble.tile.yPos - player.goalNest[0].yPos);
+            
+            distance = Mathf.Sqrt(Mathf.Pow(Mathf.Abs(tempMarble.tile.yPos - player.goalNest[0].yPos),2) + Mathf.Pow(Mathf.Abs(tempMarble.tile.xPos - player.goalNest[0].xPos), 2));
+            value -= (int)distance;
+
         }
-        Debug.Log(value);
+        //value = Random.Range(1,100);
+        //Debug.Log("Value " + value);
+        //Debug.Log("Current player = " + player.playerIndex);
         return value;
     }
     public List<State> Expand(Player player)
@@ -82,32 +89,34 @@ public class State
             for (int c = 0; c < validMoves[0].Count; c++)
             {
                 tempState = new State(this);
-                _gm.gl.MoveAMarble(tempState, FindCorrespondingTile(playerMarbles[i].tile),FindCorrespondingTile(validMoves[0][c]));
+                _gm.gl.MoveAMarble(tempState, FindCorrespondingTile(playerMarbles[i].tile, tempState),FindCorrespondingTile(validMoves[0][c],tempState));
                 children.Add(tempState);
             }
         }
 
         return children;
     }
-    Tile FindCorrespondingTile(Tile t)
-    {
-        return TileRows[t.yPos][_gm.gl.GetXIndex(t.yPos, t.xPos,this)]; 
-    }
 
+    Tile FindCorrespondingTile(Tile t,State s)
+    {
+        return s.TileRows[t.yPos][_gm.gl.GetXIndex(t.yPos, t.xPos,s)]; 
+    }
+    
     List<Marble> findPlayerMarbles(Player player)
     {
         List<Marble> tempMarbles = new List<Marble>();
-        for (int i = 0; i < _gm.gl.currentState.TileRows.Length; i++)
+        for (int i = 0; i < _tileRows.Length; i++)
         {
-            for (int j = 0; j < _gm.gl.currentState.TileRows[i].Length; j++)
+            for (int j = 0; j < _tileRows[i].Length; j++)
             {
-                if (_gm.gl.currentState.TileRows[i][j].isOccupied)
-                    if (_gm.gl.currentState.TileRows[i][j].Marble.owner.playerIndex == player.playerIndex)
-                        tempMarbles.Add(_gm.gl.currentState.TileRows[i][j].Marble);
+                if (_tileRows[i][j].isOccupied)
+                    if (_tileRows[i][j].Marble.owner.playerIndex == player.playerIndex)
+                        tempMarbles.Add(_tileRows[i][j].Marble);
             }
         }
         return tempMarbles;
     }
+    #endregion
 
     #region Konstruktor
     public State(Tile[][] tiles, Marble[,] marbles, Player activePlayer)
@@ -135,7 +144,6 @@ public class State
                     _playerMarbles[marbles[i, j].owner.playerIndex, c] = marbles[i, j];
                     c++;
                 }
-
             }
             c = 0;
         }
@@ -156,10 +164,23 @@ public class State
         _tileNests[3] = new Tile[] { _tileRows[12][0], _tileRows[9][0], _tileRows[10][0], _tileRows[10][1], _tileRows[11][0], _tileRows[11][1], _tileRows[11][2], _tileRows[12][1], _tileRows[12][2], _tileRows[12][3] };
         _tileNests[4] = new Tile[] { _tileRows[12][12], _tileRows[9][9], _tileRows[10][9], _tileRows[10][10], _tileRows[11][9], _tileRows[11][10], _tileRows[11][11], _tileRows[12][9], _tileRows[12][10], _tileRows[12][11] };
 
+        for (int i = 0; i < tiles.Length; i++)
+        {
+            for (int j = 0; j < tiles[i].Length; j++)
+            {
+                if(tiles[i][j].isOccupied)
+                {
+                    _tileRows[i][j].Marble = new Marble(tiles[i][j].Marble, _tileRows[i][j]);
+                }
+            }
+        }
+
     }
     public State(State s)
     {
         State tempState = new State(s._tileRows, s.PlayerMarbles, s._activePlayer);
+        _visitedTiles = new List<Tile>();
+        _gm = tempState.gm;
         _tileRows = tempState.TileRows;
         _playerMarbles = tempState.PlayerMarbles;
         _activePlayer = tempState.ActivePlayer;

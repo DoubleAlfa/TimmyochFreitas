@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     #region Variabler
-    int _numberOfPlayers = 2, state, playerIndex;
+    int _numberOfPlayers = 6, state, playerIndex, _depth = 2;
     GameLogic _gl;
     Board _board;
     Player[] _players;
@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     Camera _camera;
     Tile _startTile;
     Tile _endTile;
+    Minimax _mm;
     #endregion
 
     #region Properties
@@ -23,9 +24,17 @@ public class GameManager : MonoBehaviour
             return _numberOfPlayers;
         }
     }
+    public Player currentPlayer
+    {
+        get { return _currentPlayer; }
+    }
     public GameLogic gl
     {
         get { return _gl; }
+    }
+    public int depth
+    {
+        get { return _depth; }
     }
 
     #endregion
@@ -40,10 +49,11 @@ public class GameManager : MonoBehaviour
         _currentPlayer = _players[playerIndex];
         _board.AssignOwners();
         _camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        _mm = GetComponent<Minimax>();
     }
     void Update()
     {
-        if (/*_currentPlayer.human*/ true)
+        if (_currentPlayer.human)
         {
             switch (state)
             {
@@ -67,14 +77,13 @@ public class GameManager : MonoBehaviour
 
                             else
                                 break;
-                            //Färga grejer lila
-                            _board.ShowValidMoves(_startTile, true);
-                            Debug.Log(_gl.currentState.TileRows[hit.transform.gameObject.GetComponent<ObjectTile>().yIndex][hit.transform.gameObject.GetComponent<ObjectTile>().xIndex].yPos + " " + _gl.currentState.TileRows[hit.transform.gameObject.GetComponent<ObjectTile>().yIndex][hit.transform.gameObject.GetComponent<ObjectTile>().xIndex].xPos);
+                            
                             state++;
                         }
                     }
                     break;
                 case 1://Välj en bricka att hoppa till
+                    _board.ShowValidMoves(_startTile, true);
                     if (Input.GetMouseButtonDown(0))
                     {
                         RaycastHit hit;
@@ -86,7 +95,6 @@ public class GameManager : MonoBehaviour
                             if (_endTile != _startTile)
                             {
                                 _board.ShowValidMoves(_startTile, false); //Tar bort färgen från hoppbara kulor
-                                Debug.Log(_gl.currentState.TileRows[hit.transform.gameObject.GetComponent<ObjectTile>().yIndex][hit.transform.gameObject.GetComponent<ObjectTile>().xIndex].yPos + " " + _gl.currentState.TileRows[hit.transform.gameObject.GetComponent<ObjectTile>().yIndex][hit.transform.gameObject.GetComponent<ObjectTile>().xIndex].xPos);
                                 state++;
                             }
 
@@ -99,14 +107,18 @@ public class GameManager : MonoBehaviour
                     }
                     break;
                 case 2: //Gör själva flytten
-                    bool normalMove = _gl.MoveAMarble(_gl.currentState, _startTile, _endTile);
+                    int kidOfMove = _gl.MoveAMarble(_gl.currentState, _startTile, _endTile);
                     _board.PlaceTheMarbles(_gl.currentState);
-                    if (normalMove)
+                    if (kidOfMove == 0)
                         state = -1;
-                    else
+                    else if(kidOfMove == 1)
                     {
                         _gl.currentState.VisitTile(_startTile);
                         state++;
+                    }
+                    else
+                    {
+                        state = 1;
                     }
                     break;
                 case 3:
@@ -147,7 +159,7 @@ public class GameManager : MonoBehaviour
                         state = -1;
                     break;
                 case 4:
-                     normalMove = _gl.MoveAMarble(_gl.currentState, _startTile, _endTile);
+                    kidOfMove = _gl.MoveAMarble(_gl.currentState, _startTile, _endTile);
                     _board.PlaceTheMarbles(_gl.currentState);
                     _gl.currentState.VisitTile(_startTile);
                     state = 3;
@@ -159,7 +171,8 @@ public class GameManager : MonoBehaviour
                     break;
             }
         }
-
+        else
+            AITurn();
     }
     bool ExistsInList(Tile t, List<Tile> tiles)
     {
@@ -170,14 +183,18 @@ public class GameManager : MonoBehaviour
         }
         return false;
     }
-    void PassTheTurn()
+    void AITurn()
     {
-        _gl.currentState.Value(_currentPlayer);
-        
+        State s = _mm.BubbleDown(_gl.currentState,_currentPlayer, _players[0], _depth,true);
+        _gl.currentState = s;
+        _board.PlaceTheMarbles(_gl.currentState);
+        PassTheTurn();
+    }
+    void PassTheTurn()
+    {   
         //print("Player" + _currentPlayer.playerIndex + " has won the game = " + _gl.WinCheck(_gl.currentState, _currentPlayer));
         playerIndex++;
         _currentPlayer = _players[playerIndex % _numberOfPlayers];
-
     }
 
     #endregion

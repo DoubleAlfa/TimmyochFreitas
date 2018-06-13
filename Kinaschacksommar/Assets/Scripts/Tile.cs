@@ -6,24 +6,29 @@ public class Tile
 {
     #region Variabler
     Marble marble;
+    bool _isOccupied;
+    int _xPos, _yPos;
     #endregion
     #region Properties
     public bool isOccupied
     {
-        get; set;
+        get { return _isOccupied; }
+        set { _isOccupied = value; }
     }
     public int xPos
     {
-        get; set;
+        get { return _xPos; }
+        set { _xPos = value; }
     }
     public int yPos
     {
-        get; set;
+        get { return _yPos; }
+        set { _yPos = value; }
     }
     public Marble Marble
     {
         get { return marble; }
-        set { marble = value;marble.tile = this; isOccupied = true; }
+        set { marble = value; marble.tile = this; isOccupied = true; }
     }
 
 

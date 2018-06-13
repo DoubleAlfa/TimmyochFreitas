@@ -18,6 +18,7 @@ public class GameLogic : MonoBehaviour
     public State currentState
     {
         get { return _currentState; }
+        set { _currentState = value; }
     }
     public Player[] players
     {
@@ -209,6 +210,7 @@ public class GameLogic : MonoBehaviour
                     tempTile = GetAdjacent(tempTile, directions[i], s);
                     if (tempTile.xPos != -1 && !tempTile.isOccupied)
                     {
+                        
                         for (int j = 0; j < s.visitedTiles.Count; j++)
                         {
                             if (s.visitedTiles[j] == tempTile)
@@ -216,7 +218,7 @@ public class GameLogic : MonoBehaviour
                         }
                         adjacentTiles[1].Add(tempTile);
                     Exit:
-                        ;
+                         ;
                     }
 
                 }
@@ -232,7 +234,7 @@ public class GameLogic : MonoBehaviour
 
     }
 
-    public bool MoveAMarble(State s, Tile fromTile, Tile toTile)
+    public int MoveAMarble(State s, Tile fromTile, Tile toTile)
     {
         Marble m = fromTile.Marble;
         List<Tile>[] legalMoves = GetValidMoves(fromTile, s);
@@ -245,14 +247,14 @@ public class GameLogic : MonoBehaviour
                     toTile.Marble = fromTile.Marble;
                     fromTile.isOccupied = false;
                     if (i == 0)
-                        return true;
+                        return 0; //Enkelflytt
                     else
-                        return false;
+                        return 1; //Hoppade över något
 
                 }
             }
         }
-        return false;
+        return 2; //Ogiltig flytt
     }
 
     public int GetXIndex(int y, int x, State s)

@@ -12,14 +12,17 @@ public class Minimax : MonoBehaviour
             return state;
 
         State child; // En temporär variabel för att kolla vad nästa steg ska bli
-        if (max) // Ska vi maxa eller mina 
+        if (max) // Ska vi maxa eller mina
         {
-            state.currentValue = System.Int32.MinValue; // Sätter statets värde till det minsta möjliga värdet en (32-bitars) int kan ta
+            state.currentValue = int.MinValue; // Sätter statets värde till det minsta möjliga värdet en (32-bitars) int kan ta
             nextState = null;
             List<State> Children = state.Expand(player); // Children får värdet av alla möjliga moves statet state har
             foreach (State s in Children)
             {
-                child = BubbleDown(s, opponent, player, depth - 1, false); // Går ett steg djupare
+                if (true) //Datorn vill endast maxa, men eftersom att det är lånat kod så har ett försök gjorts att hålla koden intakt
+                    child = BubbleDown(s, player, opponent, depth - 1, true);
+                else
+                    child = BubbleDown(s, opponent, player, depth - 1, false); // Går ett steg djupare
                 if (child != null && child.currentValue >= state.currentValue) //Om det nya statet har ett högre värde
                 {
                     nextState = s; //Spara statet
@@ -29,7 +32,7 @@ public class Minimax : MonoBehaviour
         }
         else // Om vi inte maxar (A.K.A Minar)
         {
-            state.currentValue = System.Int32.MaxValue;
+            state.currentValue = int.MaxValue;
             nextState = null;
             List<State> Children = state.Expand(opponent);
             foreach (State s in Children)
