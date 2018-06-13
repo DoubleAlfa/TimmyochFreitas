@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
+//Av Andreas de Freitas && Timmy Alvelöv
 public class IO : MonoBehaviour
 {
     #region Variabler
@@ -14,7 +15,7 @@ public class IO : MonoBehaviour
     {
         _gm = GetComponent<GameManager>();
     }
-    public void SaveGame()
+    public void SaveGame() //Sparar spelet
     {
         if (_gm.currentPlayer.human)
         {
@@ -29,9 +30,20 @@ public class IO : MonoBehaviour
                         _save += "x";
                 }
             }
-            PlayerPrefs.SetString("SavedGame", _save); 
+            PlayerPrefs.SetString("SavedGame", _save);
         }
-       
+    }
+    public void LoadGame() //Laddar spelet
+    {
+
+    }
+    public void NewGame() //Laddar om scenen
+    {
+        SceneManager.LoadScene(0);
+    }
+    public void Quit() //Stänger av spelet
+    {
+        UnityEditor.EditorApplication.isPlaying = false;
     }
     #endregion
 }
