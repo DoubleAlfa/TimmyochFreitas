@@ -76,6 +76,7 @@ public class State
         //Debug.Log("Current player = " + player.playerIndex);
         return value;
     }
+
     public List<State> Expand(Player player)
     {
         List<State> children = new List<State>();
@@ -96,6 +97,8 @@ public class State
 
         return children;
     }
+
+    
 
     Tile FindCorrespondingTile(Tile t,State s)
     {

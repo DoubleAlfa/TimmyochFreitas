@@ -5,7 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     #region Variabler
-    int _numberOfPlayers = 6, state, playerIndex, _depth = 2;
+    int _numberOfPlayers = 4, state, playerIndex, _depth = 4;
     GameLogic _gl;
     Board _board;
     Player[] _players;
