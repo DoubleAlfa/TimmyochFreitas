@@ -11,7 +11,8 @@ public class State
     Player _activePlayer;
     GameManager _gm;
     List<Tile> _visitedTiles;
-    int _currentValue;
+    int _currentValue, _index;
+    static int _numberOfStates;
     #endregion
 
     #region Properties
@@ -40,20 +41,26 @@ public class State
     {
         get { return _gm; }
     }
+    public int Index
+    {
+        get { return _index; }
+    }
     #endregion
 
     #region Metoder
+
     public void VisitTile(Tile t)
     {
         _visitedTiles.Add(t);
     }
+
     public void ClearVisitList()
     {
         _visitedTiles.Clear();
     }
     
 
-    public int Value(Player player)
+    public int Value(Player player) //Statet värderas med en spelare i åtanke
     {
         int value = 1000;
         if (_gm.gl.WinCheck(this, player)) //Har vi vunnit i detta state?
@@ -71,13 +78,10 @@ public class State
             value -= (int)distance;
 
         }
-        //value = Random.Range(1,100);
-        //Debug.Log("Value " + value);
-        //Debug.Log("Current player = " + player.playerIndex);
         return value;
     }
 
-    public List<State> Expand(Player player)
+    public List<State> Expand(Player player) //Återlämnar alla states som AIn kan välja bland
     {
         List<State> children = new List<State>();
         List<State> tempChildren = new List<State>();
@@ -87,18 +91,50 @@ public class State
         for (int i = 0; i < playerMarbles.Count; i++)
         {
             validMoves = _gm.gl.GetValidMoves(playerMarbles[i].tile, this);
-            for (int c = 0; c < validMoves[0].Count; c++)
+            for (int c = 0; c < validMoves[0].Count; c++) //Genererar states för singelhopp
             {
                 tempState = new State(this);
-                _gm.gl.MoveAMarble(tempState, FindCorrespondingTile(playerMarbles[i].tile, tempState),FindCorrespondingTile(validMoves[0][c],tempState));
+                _gm.gl.MoveAMarble(tempState, FindCorrespondingTile(playerMarbles[i].tile, tempState), FindCorrespondingTile(validMoves[0][c], tempState));
                 children.Add(tempState);
             }
+            for (int c = 0; c < validMoves[1].Count; c++) //Genererar states för dubbelhopp
+            {
+                tempState = new State(this);
+                _gm.gl.MoveAMarble(tempState, FindCorrespondingTile(playerMarbles[i].tile, tempState), FindCorrespondingTile(validMoves[1][c], tempState));
+                children.Add(tempState);
+                //tempChildren = DoubleJumpBrancher(FindCorrespondingTile(playerMarbles[i].tile, tempState), tempState);
+            }
+            //foreach (State state in tempChildren)
+            //    children.Add(state);
         }
 
         return children;
     }
 
-    
+    List<State> DoubleJumpBrancher(Tile t, State s)
+    {
+        List<State> jumpChilds = new List<State>();
+        List<Tile> validJumps = _gm.gl.GetValidMoves(t,s)[1];
+        List<State> tempList = new List<State>();
+        State tempState;
+
+        if (validJumps.Count <= 0)
+            return jumpChilds;
+        for (int i = 0; i < validJumps.Count; i++)
+        {
+            tempState = new State(this);
+            _gm.gl.MoveAMarble(tempState, FindCorrespondingTile(t, tempState), FindCorrespondingTile(validJumps[i], tempState));
+            jumpChilds.Add(tempState);
+            Tile tempTile = FindCorrespondingTile(validJumps[i], tempState);
+            tempList = DoubleJumpBrancher(tempTile,tempState);
+        }
+        foreach (State state in tempList)
+        {
+            jumpChilds.Add(state);
+        }
+
+        return jumpChilds;
+    } //Används inte just nu, det blir problem med nullreferences när den anropar sig själv ibland
 
     Tile FindCorrespondingTile(Tile t,State s)
     {
@@ -177,17 +213,25 @@ public class State
                 }
             }
         }
+        _index = _numberOfStates;
+        _numberOfStates++;
 
     }
+
     public State(State s)
     {
         State tempState = new State(s._tileRows, s.PlayerMarbles, s._activePlayer);
         _visitedTiles = new List<Tile>();
+        for (int i = 0; i < tempState.visitedTiles.Count; i++)
+        {
+            _visitedTiles.Add(FindCorrespondingTile(visitedTiles[i],this));
+        }
         _gm = tempState.gm;
         _tileRows = tempState.TileRows;
         _playerMarbles = tempState.PlayerMarbles;
         _activePlayer = tempState.ActivePlayer;
         _tileNests = s._tileNests;
+        _index = s.Index;
     }
     #endregion
 }

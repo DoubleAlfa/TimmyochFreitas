@@ -29,29 +29,5 @@ public class Buttons : MonoBehaviour
     {
         _io.SaveGame();
     }
-
-  
-
-    //Väljer antalet spelare 
-    //public void TwoPlayers()
-    //{
-    //    PlayerPrefs.SetInt("NoP", 2);
-    //    SceneManager.LoadScene(1);
-    //}
-    //public void ThreePlayers()
-    //{
-    //    PlayerPrefs.SetInt("NoP", 3);
-    //    SceneManager.LoadScene(1);
-    //}
-    //public void FourPlayers()
-    //{
-    //    PlayerPrefs.SetInt("NoP", 4);
-    //    SceneManager.LoadScene(1);
-    //}
-    //public void SixPlayers()
-    //{
-    //    PlayerPrefs.SetInt("NoP", 6);
-    //    SceneManager.LoadScene(1);
-    //}
     #endregion
 }

@@ -4,4 +4,10 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/StartScen.unity
+    guid: c92dba42218a0724b88672f30ae9e12a
+  - enabled: 1
+    path: Assets/Scenes/KinaSchackScen.unity
+    guid: c9ca238ef3805944cbec3b44c4086877

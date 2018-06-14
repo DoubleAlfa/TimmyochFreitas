@@ -9,6 +9,7 @@ public class IO : MonoBehaviour
     GameManager _gm;
     State _currentState;
     string _save = "";
+    GameObject[] _buttons;
     #endregion
     #region Metoder
     void Start()
@@ -17,7 +18,7 @@ public class IO : MonoBehaviour
     }
     public void SaveGame() //Sparar spelet
     {
-        if (_gm.currentPlayer.human)
+        if (_gm.currentPlayer.human && _gm.state == 0)
         {
             _currentState = _gm.gl.currentState;
             for (int i = 0; i < _currentState.TileRows.Length; i++)
@@ -31,19 +32,53 @@ public class IO : MonoBehaviour
                 }
             }
             PlayerPrefs.SetString("SavedGame", _save);
+            PlayerPrefs.SetInt("NoPSave", _gm.NumberOfPlayers);
         }
     }
     public void LoadGame() //Laddar spelet
     {
-
+        PlayerPrefs.SetInt("LoadedGame", 1);
+        PlayerPrefs.SetInt("NoP", PlayerPrefs.GetInt("NoPSave"));
+        SceneManager.LoadScene(1);
     }
     public void NewGame() //Laddar om scenen
     {
-        SceneManager.LoadScene(0);
+        PlayerPrefs.SetInt("LoadedGame", 0);
+        _buttons = new GameObject[] { transform.GetChild(0).gameObject, transform.GetChild(1).gameObject };
+        _buttons[1].SetActive(true);
+        _buttons[0].SetActive(false);
+
+    }
+    public void Restart()
+    {
+        PlayerPrefs.SetInt("NoP", _gm.NumberOfPlayers);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     public void Quit() //Stänger av spelet
     {
         UnityEditor.EditorApplication.isPlaying = false;
+    }
+
+    //Väljer antalet spelare
+    public void TwoPlayers()
+    {
+        PlayerPrefs.SetInt("NoP", 2);
+        SceneManager.LoadScene(1);
+    }
+    public void ThreePlayers()
+    {
+        PlayerPrefs.SetInt("NoP", 3);
+        SceneManager.LoadScene(1);
+    }
+    public void FourPlayers()
+    {
+        PlayerPrefs.SetInt("NoP", 4);
+        SceneManager.LoadScene(1);
+    }
+    public void SixPlayers()
+    {
+        PlayerPrefs.SetInt("NoP", 6);
+        SceneManager.LoadScene(1);
     }
     #endregion
 }
