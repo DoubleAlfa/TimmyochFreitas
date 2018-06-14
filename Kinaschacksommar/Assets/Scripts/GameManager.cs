@@ -5,7 +5,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     #region Variabler
-    int _numberOfPlayers, _state, playerIndex, _depth = 1;
+    bool _gameWon;
+    int _numberOfPlayers, _state, playerIndex, _depth = 3;
     GameLogic _gl;
     Board _board;
     [SerializeField]
@@ -50,6 +51,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         _numberOfPlayers = PlayerPrefs.GetInt("NoP");
+        _depth = PlayerPrefs.GetInt("Diff");
     }
     void Start()
     {
@@ -126,7 +128,9 @@ public class GameManager : MonoBehaviour
                 case 2: //Gör själva flytten
                     int kidOfMove = _gl.MoveAMarble(_gl.currentState, _startTile, _endTile);
                     _board.PlaceTheMarbles(_gl.currentState);
-                    if (kidOfMove == 0)
+                    if (_gl.WinCheck(_gl.currentState, _currentPlayer))
+                        _state = -2;
+                    else if (kidOfMove == 0)
                         _state = -1;
                     else if (kidOfMove == 1)
                     {
@@ -156,7 +160,6 @@ public class GameManager : MonoBehaviour
                                 if (_endTile != _startTile && ExistsInList(_endTile, moves))
                                 {
                                     _board.ShowJumpMoves(_startTile, false); //Tar bort färgen från hoppbara kulor
-                                    Debug.Log(_gl.currentState.TileRows[hit.transform.gameObject.GetComponent<ObjectTile>().yIndex][hit.transform.gameObject.GetComponent<ObjectTile>().xIndex].yPos + " " + _gl.currentState.TileRows[hit.transform.gameObject.GetComponent<ObjectTile>().yIndex][hit.transform.gameObject.GetComponent<ObjectTile>().xIndex].xPos);
                                     _state++;
                                 }
                                 else
@@ -180,6 +183,8 @@ public class GameManager : MonoBehaviour
                     _board.PlaceTheMarbles(_gl.currentState);
                     _gl.currentState.VisitTile(_startTile);
                     _state = 3;
+                    if (_gl.WinCheck(_gl.currentState, _currentPlayer))
+                        _state = -2;
                     break;
                 case -1:
                     PassTheTurn();
@@ -187,25 +192,16 @@ public class GameManager : MonoBehaviour
                     _gl.currentState.ClearVisitList();
                     break;
                 case -2:
-                    _wintext.SetActive(true);
-                    if (_currentPlayer.human)
-                    {
-                        _wintext.transform.GetChild(0).GetComponent<TextMesh>().text = "You Won!\nClick 'restart' to play again!";
-                    }
-                    else
-                    {
-                        _wintext.transform.GetChild(0).GetComponent<TextMesh>().text = "Player "+ currentPlayer.playerIndex+1 + " Won!\nClick 'restart' to try again!";
-                    }
-                    _state--;
+                    winState();
                     break;
                 case -3:
                     break;
             }
         }
-        else
+        else if (!_gameWon)
             AITurn();
     }
-    bool ExistsInList(Tile t, List<Tile> tiles)
+    bool ExistsInList(Tile t, List<Tile> tiles) //Kollar så att angiven bricka finns i den givna listan
     {
         for (int i = 0; i < tiles.Count; i++)
         {
@@ -214,16 +210,36 @@ public class GameManager : MonoBehaviour
         }
         return false;
     }
-    void AITurn()
+    void winState() //Sätter spelet i vinststadiet
+    {
+        _gameWon = true;
+        _wintext.SetActive(true);
+        if (_currentPlayer.human)
+        {
+            _wintext.transform.GetChild(0).GetComponent<TextMesh>().text = "You Won!\nClick 'restart' to play again!";
+        }
+        else
+        {
+            _wintext.transform.GetChild(0).GetComponent<TextMesh>().text = "Player " + (currentPlayer.playerIndex + 1) + " Won!\nClick 'restart' to try again!";
+        }
+        _state--;
+    }
+    void AITurn() //Hanterar AI:ns tur
     {
         State s = _mm.BubbleDown(_gl.currentState, _currentPlayer, _players[0], _depth, true);
         _gl.currentState = s;
         _board.PlaceTheMarbles(_gl.currentState);
+        if (_gl.WinCheck(gl.currentState, _currentPlayer))
+        {
+            winState();
+            _state = -2;
+        }
+
+
         PassTheTurn();
     }
-    void PassTheTurn()
+    void PassTheTurn() //Passar över turen till nästa spelare
     {
-        //print("Player" + _currentPlayer.playerIndex + " has won the game = " + );
         playerIndex++;
         _currentPlayer = _players[playerIndex % _numberOfPlayers];
     }

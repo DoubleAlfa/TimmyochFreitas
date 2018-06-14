@@ -29,11 +29,11 @@ public class ObjectTile : MonoBehaviour
         _startColor = GetComponent<Renderer>().material.color;
     }
 
-    public void ShowColor()
+    public void ShowColor() //Ändrar sin färg till magenta
     {
         GetComponent<Renderer>().material.color = Color.magenta;
     }
-    public void ResetColor()
+    public void ResetColor() //Återställer färgen till startfärgen
     {
         GetComponent<Renderer>().material.color = _startColor;
     }

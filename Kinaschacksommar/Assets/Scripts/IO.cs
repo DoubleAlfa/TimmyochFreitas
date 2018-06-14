@@ -33,12 +33,14 @@ public class IO : MonoBehaviour
             }
             PlayerPrefs.SetString("SavedGame", _save);
             PlayerPrefs.SetInt("NoPSave", _gm.NumberOfPlayers);
+            PlayerPrefs.SetInt("DiffSave", _gm.depth);
         }
     }
     public void LoadGame() //Laddar spelet
     {
         PlayerPrefs.SetInt("LoadedGame", 1);
         PlayerPrefs.SetInt("NoP", PlayerPrefs.GetInt("NoPSave"));
+        PlayerPrefs.SetInt("Diff", PlayerPrefs.GetInt("DiffSave"));
         SceneManager.LoadScene(1);
     }
     public void NewGame() //Laddar om scenen
@@ -49,9 +51,10 @@ public class IO : MonoBehaviour
         _buttons[0].SetActive(false);
 
     }
-    public void Restart()
+    public void Restart() //Startar om spelet
     {
         PlayerPrefs.SetInt("NoP", _gm.NumberOfPlayers);
+        PlayerPrefs.SetInt("LoadedGame", 0);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     public void Quit() //Stänger av spelet
@@ -79,6 +82,23 @@ public class IO : MonoBehaviour
     {
         PlayerPrefs.SetInt("NoP", 6);
         SceneManager.LoadScene(1);
+    }
+
+    public void Easy()
+    {
+        PlayerPrefs.SetInt("Diff", 1);
+    }
+    public void Medium()
+    {
+        PlayerPrefs.SetInt("Diff", 2);
+    }
+    public void Hard()
+    {
+        PlayerPrefs.SetInt("Diff", 3);
+    }
+    public void Extreme()
+    {
+        PlayerPrefs.SetInt("Diff", 4);
     }
     #endregion
 }

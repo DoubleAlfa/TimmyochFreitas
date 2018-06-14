@@ -62,7 +62,7 @@ public class State
 
     public int Value(Player player) //Statet värderas med en spelare i åtanke
     {
-        int value = 1000;
+        int value = int.MaxValue;
         if (_gm.gl.WinCheck(this, player)) //Har vi vunnit i detta state?
             return value;
 
@@ -74,7 +74,7 @@ public class State
         {
             tempMarble = tempMarbles[i];
             
-            distance = Mathf.Sqrt(Mathf.Pow(Mathf.Abs(tempMarble.tile.yPos - player.goalNest[0].yPos),2) + Mathf.Pow(Mathf.Abs(tempMarble.tile.xPos - player.goalNest[0].xPos), 2));
+            distance = Mathf.Sqrt(Mathf.Pow(Mathf.Abs(tempMarble.tile.yPos - player.goalNest[0].yPos),2)*1.5f + Mathf.Pow(Mathf.Abs(tempMarble.tile.xPos - player.goalNest[0].xPos), 2));
             value -= (int)distance;
 
         }

@@ -32,7 +32,7 @@ public class GameLogic : MonoBehaviour
         _gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         _board = GameObject.Find("Board").GetComponent<Board>();
     }
-    public void CreateStartState()
+    public void CreateStartState() //Skapar det första statet
     {
         Tile[][] tempTiles = new Tile[17][];
         Tile[][] tempNests = new Tile[6][];
@@ -121,7 +121,7 @@ public class GameLogic : MonoBehaviour
         _board.PlaceTheMarbles(_currentState);
     }
 
-    public void CreateSavedState()
+    public void CreateSavedState() //Återskapar ett sparat state
     {
         string load = PlayerPrefs.GetString("SavedGame");
         List<char> tiles = new List<char>();
@@ -230,7 +230,7 @@ public class GameLogic : MonoBehaviour
     }
 
 
-    Tile GetAdjacent(Tile t, Dir direction, State s)
+    Tile GetAdjacent(Tile t, Dir direction, State s) //Hämtar den valda brickans granne i en given riktning
     {
         if (t.yPos % 2 != 0)
         {
@@ -301,7 +301,7 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    public List<Tile>[] GetValidMoves(Tile t, State s)
+    public List<Tile>[] GetValidMoves(Tile t, State s) //Hämtar tillåtna förflyttningar
     {
         List<Tile>[] adjacentTiles = new List<Tile>[2];
         adjacentTiles[0] = new List<Tile>();
@@ -336,13 +336,13 @@ public class GameLogic : MonoBehaviour
         return adjacentTiles;
     }
 
-    public List<Tile> GetJumpMoves(Tile t, State s)
+    public List<Tile> GetJumpMoves(Tile t, State s) //Hämtar tillgängliga hopp
     {
         return GetValidMoves(t, s)[1];
 
     }
 
-    public int MoveAMarble(State s, Tile fromTile, Tile toTile)
+    public int MoveAMarble(State s, Tile fromTile, Tile toTile) //Flyttar pjäsen
     {
         Marble m = fromTile.Marble;
         List<Tile>[] legalMoves = GetValidMoves(fromTile, s);
@@ -369,13 +369,13 @@ public class GameLogic : MonoBehaviour
         return 2; //Ogiltig flytt
     }
 
-    public int GetXIndex(int y, int x, State s)
+    public int GetXIndex(int y, int x, State s) //Hämtar x index
     {
         int startIndex = 6 - (s.TileRows[y].Length / 2);
         return x - startIndex;
     }
 
-    public bool WinCheck(State state, Player player)
+    public bool WinCheck(State state, Player player) //Kollar om angiven spelare har vunnit
     {
         Tile tempTile;
         for (int i = 0; i < player.goalNest.Length; i++)

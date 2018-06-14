@@ -83,7 +83,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    void SetNests()
+    void SetNests() //skapar bo:n
     {
         _nests = new GameObject[6][];
 
@@ -119,7 +119,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void PlaceTheMarbles(State s)
+    public void PlaceTheMarbles(State s) //Placerar ut pjäser i bo:nen
     {
         int[] playerCounter = new int[_gm.NumberOfPlayers];
         for (int i = 0; i < s.TileRows.Length; i++)
@@ -136,13 +136,13 @@ public class Board : MonoBehaviour
             }
         }
     }
-    public GameObject GetTileCoords(int x, int y)
+    public GameObject GetTileCoords(int x, int y) //Hämtar objektet med givna koordinater
     {
         int startIndex = 6 - (_tileRows[y] / 2);
         return _tiles[y][x - startIndex];
     }
 
-    public void ShowValidMoves(Tile fromTile, bool showColor)
+    public void ShowValidMoves(Tile fromTile, bool showColor) //Visar spelaren dens tillgängliga val av förflyttningar
     {
         List<Tile>[] validMoves = new List<Tile>[2];
         validMoves = _gl.GetValidMoves(fromTile, _gl.currentState);
@@ -158,7 +158,7 @@ public class Board : MonoBehaviour
         }
 
     }
-    public void ShowJumpMoves(Tile fromTile, bool showColor)
+    public void ShowJumpMoves(Tile fromTile, bool showColor) //Visar hopp
     {
         List<Tile>[] validMoves = new List<Tile>[2];
         validMoves = _gl.GetValidMoves(fromTile, _gl.currentState);
@@ -171,7 +171,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void AssignOwners()
+    public void AssignOwners() //Bestämmer vem som äger pjäserna
     {
         for (int i = 0; i < _marbles.GetLength(0); i++)
         {
